@@ -42,9 +42,9 @@ regd_users.post("/login", (req,res) => {
     }, 'access', { expiresIn: 60 * 60 });
 
     req.session.authorization = {
-      accessToken,username
-  }
-  return res.status(200).send("User successfully logged in");
+        accessToken,username
+    }
+    return res.status(200).send("User successfully logged in");
   } else {
     return res.status(208).json({message: "Invalid Login. Check username and password"});
   }
@@ -53,8 +53,31 @@ regd_users.post("/login", (req,res) => {
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
-  //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+    let isbn = req.params.isbn;
+    let book = books[isbn];
+    let reviews = book.reviews;
+    let newReview = req.query.review;
+    let user = req.session.authorization.username;
+    reviews[user] = newReview;
+    res.send("Book review for book " + isbn + " added.");
+});
+
+// Delete a book review
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    let isbn = req.params.isbn;
+    let book = books[isbn];
+    let reviews = book.reviews;
+    let newReviews = {};
+    let user = req.session.authorization.username;
+    Object.keys(reviews).forEach(reviewKey => {
+        
+        if (reviewKey != user) {
+            newReviews[user] = review;
+        }
+    });
+    book.reviews = newReviews;
+    //reviews[user].delete;
+    res.send("Book review for book " + isbn + " posted by user " + user + " deleted.");
 });
 
 module.exports.authenticated = regd_users;
